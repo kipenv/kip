@@ -14,8 +14,7 @@ Share encrypted secrets with self-destructing links. One command. No accounts. Z
 
 [Website](https://kipenv.dev) · [Install](#install) · [How It Works](#how-it-works) · [Self-Host](#self-hosting) · [Security](#security)
 
-<!-- TODO: Replace with actual GIF once recorded with VHS -->
-<img src="assets/demo.gif" alt="kip demo — push, share, pull" width="600" />
+<img src="assets/demo-split.gif" alt="kip demo — push on one machine, pull on another" width="700" />
 
 </div>
 
@@ -49,7 +48,7 @@ $ kip push .env.staging
   Share this link. It self-destructs after being read.
 ```
 
-The receiver opens the link in their browser — no CLI needed. The secret is decrypted locally using the key in the `#fragment` (never sent to the server). After one read, the link is permanently destroyed.
+The receiver opens the link in their browser — no CLI needed. The secret is decrypted locally using the key in the `#fragment` (never sent to the server). After the configured number of reads (default: one), the link is permanently destroyed.
 
 ---
 
@@ -154,6 +153,7 @@ kip is built on a **zero-knowledge** architecture. The server never sees your se
 | Brute force link IDs | IDs are sufficiently random (nanoid, 12+ chars) |
 | Replay attacks | Read counter + TTL — links die after use |
 | Malicious server operator | Can't decrypt; can only delete (acceptable) |
+| Browser history / referrer leak | Fragment stored in browser history; decrypt page loads zero third-party scripts |
 
 For full details, see [SECURITY.md](SECURITY.md).
 
@@ -166,7 +166,7 @@ For full details, see [SECURITY.md](SECURITY.md).
 | **Zero-knowledge encryption** | AES-256-GCM — server never sees the key |
 | **Self-destructing links** | TTL + read limit — configurable per share |
 | **Password protection** | Optional Argon2id-derived password layer |
-| **Browser decrypt** | Receivers don't need the CLI — Web Crypto API |
+| **Browser decrypt** | Decrypts in-browser via Web Crypto API — no CLI required for receivers |
 | **Teams** | Lightweight team sharing — like game lobbies, no admin panels |
 | **AI security scan** | Regex + optional LLM to detect dangerous keys before sharing |
 | **Self-hostable** | Docker Compose — one command, your infrastructure |
@@ -222,6 +222,8 @@ services:
       - "8080:8080"
     environment:
       - REDIS_URL=redis://redis:6379
+    volumes:
+      - kip-data:/data
     depends_on:
       - redis
 
@@ -232,6 +234,7 @@ services:
 
 volumes:
   redis-data:
+  kip-data:
 ```
 
 ```bash
@@ -239,7 +242,7 @@ docker compose up -d
 kip config set server http://localhost:8080
 ```
 
-That's it. No per-seat pricing. No license keys. SQLite for teams, Redis for secrets.
+That's it. No per-seat pricing. No license keys. SQLite for teams (embedded in the binary — no extra service), Redis for secrets. Mount a volume at `/data` if you want team state to persist across container restarts.
 
 ---
 
@@ -281,12 +284,13 @@ kip config set ai.model llama3.1:8b
 | Native CLI | **Yes** | No | No | Yes | Yes | Yes |
 | Zero-knowledge | **Yes** | No | Yes | No | No | No |
 | Self-destructing | **Yes** | No | Yes | No | No | No |
-| No account needed | **Yes** | - | Yes | No | No | No |
+| No account for push/pull | **Yes** | - | Yes | No | No | No |
 | Self-hostable | **Yes** | No | Yes | No | No | Yes |
 | Teams | **Yes** | - | No | Yes | Yes | Yes |
 | .env focused | **Yes** | No | No | No | Yes | No |
 | AI scan | **Yes** | No | No | No | No | No |
 | Free | **Yes** | - | Yes | No | No | No |
+
 kip sits between "paste it in Slack" and "deploy HashiCorp Vault". It's the tool for teams that want security without the overhead.
 
 ---

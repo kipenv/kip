@@ -3,7 +3,7 @@ if [[ "$1" == "push" ]]; then
   sleep 0.5
   echo ""
   echo "  Encrypted with AES-256-GCM"
-  echo "  Link: https://envshare.dev/s/x8f9k2#3Kj8mNvP7qR2wX5yZ9aB4cD6eF8gH0jK"
+  echo "  Link: https://kipenv.dev/s/x8f9k2#3Kj8mNvP7qR2wX5yZ9aB4cD6eF8gH0jK"
   echo "  Expires: 1 hour | Reads: 1"
   echo ""
   echo "  Share this link. It self-destructs after being read."
