@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/* ═══ Theme System ═══ */
+@theme {
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Theme-aware tokens (default = clean theme) */
+  --color-accent: var(--t-accent, #FAFAFA);
+  --color-accent-hover: var(--t-accent-hover, #E4E4E7);
+  --color-accent-text: var(--t-accent-text, #09090B);
+  --color-hi: var(--t-hi, #A78BFA);
+  --color-hi-dim: var(--t-hi-dim, #7C3AED);
+
+  --color-s1: var(--t-s1, #09090B);
+  --color-s2: var(--t-s2, #111113);
+  --color-s3: var(--t-s3, #18181B);
+  --color-s4: var(--t-s4, #1F1F23);
+  --color-b1: var(--t-b1, #ffffff0f);
+  --color-b2: var(--t-b2, #ffffff1a);
+  --color-t1: var(--t-t1, #FAFAFA);
+  --color-t2: var(--t-t2, #A1A1AA);
+  --color-t3: var(--t-t3, #52525B);
+  --color-term: var(--t-term, #0C0C0E);
+
+  /* Static colors (don't change per theme) */
+  --color-amber: #FBBF24;
+  --color-red: #F87171;
+  --color-sky: #60A5FA;
+  --color-emerald: #34D399;
+}
+
+/* ─── Clean theme (default) ─── */
+:root, .theme-clean {
+  --t-accent: #FAFAFA;
+  --t-accent-hover: #E4E4E7;
+  --t-accent-text: #09090B;
+  --t-hi: #A78BFA;
+  --t-hi-dim: #7C3AED;
+  --t-s1: #09090B;
+  --t-s2: #111113;
+  --t-s3: #18181B;
+  --t-s4: #1F1F23;
+  --t-b1: #1E1E22;
+  --t-b2: #2A2A30;
+  --t-t1: #FAFAFA;
+  --t-t2: #A1A1AA;
+  --t-t3: #52525B;
+  --t-term: #0C0C0E;
+}
+
+/* ─── Lime/Terminal theme ─── */
+.theme-lime {
+  --t-accent: #A8FF3E;
+  --t-accent-hover: #C4FF5A;
+  --t-accent-text: #060807;
+  --t-hi: #A8FF3E;
+  --t-hi-dim: #7BC82E;
+  --t-s1: #060807;
+  --t-s2: #0D1210;
+  --t-s3: #121A13;
+  --t-s4: #182018;
+  --t-b1: #1C281C;
+  --t-b2: #263626;
+  --t-t1: #DCF0DC;
+  --t-t2: #829882;
+  --t-t3: #4E634E;
+  --t-term: #080A08;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-color: var(--t-s1);
+    color: var(--t-t1);
+  }
+  ::selection {
+    background-color: var(--t-hi);
+    color: var(--t-s1);
+  }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--t-s1); }
+  ::-webkit-scrollbar-thumb { background: var(--t-b2); border-radius: 2px; }
+}
+
+/* ═══ Animations ═══ */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes scan {
+  0% { top: 0; opacity: 0.3; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px color-mix(in srgb, var(--t-hi) 60%, transparent); }
+  50% { box-shadow: 0 0 16px color-mix(in srgb, var(--t-hi) 90%, transparent); }
+}
+.pulse-glow {
+  animation: pulse-glow 2.5s infinite;
+}
+
+@keyframes scroll-logos {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ═══ Theme-specific backgrounds ═══ */
+.hero-bg-clean {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, color-mix(in srgb, var(--t-hi) 8%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 75% 25%, color-mix(in srgb, var(--t-hi) 4%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 90%, rgba(59,130,246,0.03) 0%, transparent 50%);
+}
+
+.hero-bg-lime {
+  background-image: linear-gradient(var(--t-b1) 1px, transparent 1px), linear-gradient(90deg, var(--t-b1) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.25;
+}
+
+/* Glass effect for clean theme */
+.glass {
+  background: color-mix(in srgb, var(--t-s2) 70%, transparent);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+
+/* Card hover gradient for clean theme */
+.card-glow:hover {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px color-mix(in srgb, var(--t-hi) 10%, transparent);
+}
