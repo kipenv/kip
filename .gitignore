@@ -1,0 +1,49 @@
+# Binaries
+bin/
+envshare
+kip
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go
+vendor/
+
+# Test
+*.test
+*.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal planning docs
+BLUEPRINT.md
+DEVELOPMENT_PLAN.md
+
+# Project
+.env
+.env.*
+!.env.example
+.envshare
+*.db
+*.db-journal
+*.db-wal
+
+# Node (web/)
+web/node_modules/
+web/dist/
+web/.astro/
+
+# Docker
+*.log
