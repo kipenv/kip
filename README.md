@@ -6,13 +6,13 @@
 
 Share encrypted secrets with self-destructing links. One command. No accounts. Zero-knowledge.
 
-[![CI](https://github.com/antoniojosev/kip/actions/workflows/ci.yml/badge.svg)](https://github.com/antoniojosev/kip/actions/workflows/ci.yml)
-[![Release](https://github.com/antoniojosev/kip/actions/workflows/release.yml/badge.svg)](https://github.com/antoniojosev/kip/releases)
+[![CI](https://github.com/kipenv/kip/actions/workflows/ci.yml/badge.svg)](https://github.com/kipenv/kip/actions/workflows/ci.yml)
+[![Release](https://github.com/kipenv/kip/actions/workflows/release.yml/badge.svg)](https://github.com/kipenv/kip/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![Self-Hosted](https://img.shields.io/badge/Self--Hosted-Docker-2496ED?logo=docker&logoColor=white)](#self-hosting)
 
-[Website](https://kip.dev) · [Install](#install) · [How It Works](#how-it-works) · [Self-Host](#self-hosting) · [Security](#security)
+[Website](https://kipenv.dev) · [Install](#install) · [How It Works](#how-it-works) · [Self-Host](#self-hosting) · [Security](#security)
 
 <!-- TODO: Replace with actual GIF once recorded with VHS -->
 <img src="assets/demo.gif" alt="kip demo — push, share, pull" width="600" />
@@ -43,7 +43,7 @@ Now those credentials live forever in your Slack history, searchable by anyone w
 $ kip push .env.staging
 
   Encrypted with AES-256-GCM
-  Link: https://kip.dev/s/x8f9k2#3Kj8mN...
+  Link: https://kipenv.dev/s/x8f9k2#3Kj8mN...
   Expires: 1 hour | Reads: 1
 
   Share this link. It self-destructs after being read.
@@ -64,19 +64,19 @@ brew install kip
 ### Go
 
 ```bash
-go install github.com/antoniojosev/kip@latest
+go install github.com/kipenv/kip@latest
 ```
 
 ### curl
 
 ```bash
-curl -fsSL https://kip.dev/install.sh | sh
+curl -fsSL https://kipenv.dev/install.sh | sh
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/antoniojosev/kip.git
+git clone https://github.com/kipenv/kip.git
 cd kip
 make build
 ```
@@ -96,7 +96,7 @@ kip push .env --expires 24h --reads 3
 kip push .env --password
 
 # Receive (CLI)
-kip pull https://kip.dev/s/x8f9k2#3Kj8mN...
+kip pull https://kipenv.dev/s/x8f9k2#3Kj8mN...
 
 # Receive (browser) — just open the link, no install needed
 ```
@@ -118,7 +118,7 @@ Your machine                          Server
     |                                    |  Return ID: "x8f9k2"
     |                                    |
     |  Build URL:                        |
-    |  kip.dev/s/x8f9k2#<key>      |
+    |  kipenv.dev/s/x8f9k2#<key>      |
 ```
 
 ### 2. Share the link
@@ -217,7 +217,7 @@ kip is **free to self-host forever**. MIT License. Your data, your servers.
 # docker-compose.yml
 services:
   kip:
-    image: kip/server:latest
+    image: ghcr.io/kipenv/kip-server:latest
     ports:
       - "8080:8080"
     environment:
@@ -388,7 +388,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 <div align="center">
 
-**[kip.dev](https://kip.dev)**
+**[kipenv.dev](https://kipenv.dev)**
 
 Built by [Antonio Vila](https://antoniovila.dev)
 

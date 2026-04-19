@@ -10,10 +10,10 @@ Todo lo que necesitas probar, corregir y configurar antes de lanzar.
 cd ~/proyectos/envshares/envshare
 
 # Compilar CLI
-go build -o bin/envshare ./cmd/envshare/
+go build -o bin/kip ./cmd/kip/
 
 # Compilar server (necesita CGO para SQLite)
-CGO_ENABLED=1 go build -o bin/envshare-server ./server/cmd/server/
+CGO_ENABLED=1 go build -o bin/kip-server ./server/cmd/server/
 ```
 
 **Consideraciones:**
@@ -78,15 +78,15 @@ curl http://localhost:8080/health
 # Debe responder: {"status":"ok"}
 
 # Probar push/pull con el CLI apuntando al server local
-./bin/envshare config set server http://localhost:8080
-./bin/envshare push test.env
+./bin/kip config set server http://localhost:8080
+./bin/kip push test.env
 # Copiar el link y hacer pull
-./bin/envshare pull <link>
+./bin/kip pull <link>
 
 # Probar revoke
-./bin/envshare push test.env --reads 5
+./bin/kip push test.env --reads 5
 # Copiar el ID del link
-./bin/envshare revoke <link>
+./bin/kip revoke <link>
 
 # Verificar rate limiting (opcional)
 # Hacer más de 30 requests en un minuto y ver que devuelve 429
@@ -152,7 +152,7 @@ uname -m  # Debe dar x86_64 o arm64/aarch64
   git push origin v0.1.0
   # El GitHub Action de release corre goreleaser automáticamente
   # Luego testea:
-  curl -fsSL https://raw.githubusercontent.com/antoniojosev/envshare/main/install.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/kipenv/kip/main/install.sh | sh
   ```
 - El script instala en `/usr/local/bin` — si no tienes permisos, usa `sudo`
 - En macOS puede haber warnings de Gatekeeper. Los usuarios tendrían que ir a System Preferences > Security para permitir el binario
@@ -179,7 +179,7 @@ golangci-lint run ./...
 - El CI usa `go-version-file: go.mod` — toma la versión de Go de tu go.mod automáticamente
 - El CI levanta Redis como service container para los tests de integración
 - Si el CI falla por SQLite/CGO: el step `Install dependencies` instala `gcc` en Ubuntu. Verifica que es suficiente
-- Los badges del README apuntan a `antoniojosev/envshare` — si tu repo está en otro org/user, actualiza los URLs en el README
+- Los badges del README apuntan a `kipenv/kip` — si tu repo está en otro org/user, actualiza los URLs en el README
 - **golangci-lint-action@v6** siempre usa la última versión del linter. Si necesitas fijar una versión, agrega `version: v1.62.0` (o la que quieras)
 
 ---
@@ -193,7 +193,7 @@ Los badges se van a mostrar como "no found" o "failing" hasta que:
 
 ```bash
 # Después de pushear todo a main, verifica los badges en:
-# https://github.com/antoniojosev/envshare
+# https://github.com/kipenv/kip
 ```
 
 **Consideraciones:**
@@ -208,7 +208,7 @@ Los badges se van a mostrar como "no found" o "failing" hasta que:
   ```
   Y agregar el badge al README:
   ```
-  [![codecov](https://codecov.io/gh/antoniojosev/envshare/branch/main/graph/badge.svg)](https://codecov.io/gh/antoniojosev/envshare)
+  [![codecov](https://codecov.io/gh/kipenv/kip/branch/main/graph/badge.svg)](https://codecov.io/gh/kipenv/kip)
   ```
 
 ---
@@ -217,7 +217,7 @@ Los badges se van a mostrar como "no found" o "failing" hasta que:
 
 ### 9a. Comprar dominio
 
-- **envshare.dev** (si está disponible) — los `.dev` son HTTPS-only por defecto, perfecto para una herramienta de seguridad
+- **kipenv.dev** (si está disponible) — los `.dev` son HTTPS-only por defecto, perfecto para una herramienta de seguridad
 - Alternativas: `envshare.io`, `envshare.sh`, `getenvshare.com`
 - Registradores baratos: Namecheap, Cloudflare Registrar, Porkbun
 
@@ -242,14 +242,14 @@ fly deploy --dockerfile deploy/Dockerfile
 **Opción B: VPS (DigitalOcean, Hetzner, etc.)**
 ```bash
 # En el VPS:
-git clone https://github.com/antoniojosev/envshare.git
+git clone https://github.com/kipenv/kip.git
 cd envshare
 docker compose -f deploy/docker-compose.yml up -d
 
 # Configurar reverse proxy (Caddy es el más simple):
 sudo apt install caddy
 # Editar /etc/caddy/Caddyfile:
-# envshare.dev {
+# kipenv.dev {
 #     reverse_proxy localhost:8080
 # }
 sudo systemctl restart caddy
@@ -260,7 +260,7 @@ sudo systemctl restart caddy
 - Fly.io tiene free tier (3 shared VMs). Suficiente para arrancar
 - Si usas VPS, Hetzner es el más barato (~€4/mes). DigitalOcean ~$6/mes
 - **Redis en producción:** Fly.io tiene Redis managed. En VPS, el docker-compose ya incluye Redis
-- **Backups:** Los secrets son efímeros (se auto-destruyen). SQLite para teams sí necesita backup. Agrega un cron: `0 */6 * * * cp /path/to/envshare.db /path/to/backup/`
+- **Backups:** Los secrets son efímeros (se auto-destruyen). SQLite para teams sí necesita backup. Agrega un cron: `0 */6 * * * cp /path/to/kip.db /path/to/backup/`
 
 ### 9c. Deploy de la landing page
 
@@ -283,23 +283,23 @@ npx vercel
 
 ```bash
 # Crear repo para el tap
-# GitHub: antoniojosev/homebrew-tap
+# GitHub: kipenv/homebrew-tap
 
 # Crear la fórmula (goreleaser puede hacerlo automáticamente)
 # Agregar a .goreleaser.yml:
 #
 # brews:
 #   - repository:
-#       owner: antoniojosev
+#       owner: kipenv
 #       name: homebrew-tap
-#     homepage: https://envshare.dev
+#     homepage: https://kipenv.dev
 #     description: Share encrypted .env files with self-destructing links
 #     license: MIT
 #     install: |
 #       bin.install "envshare"
 
 # Después del release, los usuarios instalan con:
-# brew tap antoniojosev/tap
+# brew tap kipenv/tap
 # brew install envshare
 ```
 
@@ -320,8 +320,8 @@ Checklist final:
 - [ ] goreleaser dry run pasa (al menos el CLI)
 - [ ] README no tiene placeholders/TODOs visibles
 - [ ] GIF demo se ve bien en GitHub
-- [ ] Links del README apuntan al repo correcto (`antoniojosev/envshare`)
-- [ ] `go install github.com/antoniojosev/envshare@latest` funciona (después de push a main)
+- [ ] Links del README apuntan al repo correcto (`kipenv/kip`)
+- [ ] `go install github.com/kipenv/kip@latest` funciona (después de push a main)
 - [ ] Decidir si el server se distribuye como binario o solo Docker
 - [ ] SECURITY.md tiene info de contacto real para reportar vulnerabilidades
 
@@ -332,7 +332,7 @@ git push origin v0.1.0
 # GitHub Action genera los binarios automáticamente
 
 # Verificar:
-# https://github.com/antoniojosev/envshare/releases
+# https://github.com/kipenv/kip/releases
 ```
 
 ---

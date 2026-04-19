@@ -12,7 +12,7 @@ Thanks for your interest. kip is a small, focused project — contributions that
 ## Setup
 
 ```bash
-git clone https://github.com/antoniojosev/kip.git
+git clone https://github.com/kipenv/kip.git
 cd kip
 
 # Build the CLI
@@ -71,7 +71,7 @@ Keep PRs small and focused. One thing per PR.
 
 ## Good First Issues
 
-Look for issues labeled [`good first issue`](https://github.com/antoniojosev/kip/labels/good%20first%20issue). These are scoped tasks that don't require deep knowledge of the codebase.
+Look for issues labeled [`good first issue`](https://github.com/kipenv/kip/labels/good%20first%20issue). These are scoped tasks that don't require deep knowledge of the codebase.
 
 ## Security Issues
 

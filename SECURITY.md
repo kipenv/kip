@@ -16,7 +16,7 @@ kip uses a **zero-knowledge** architecture. The server never sees decryption key
 
 1. The CLI encrypts your `.env` file locally with **AES-256-GCM** using a random 32-byte key
 2. The encrypted blob and nonce are sent to the server — the key is **never** transmitted
-3. The key is encoded in the URL `#fragment` (e.g., `kip.dev/s/abc123#<key>`)
+3. The key is encoded in the URL `#fragment` (e.g., `kipenv.dev/s/abc123#<key>`)
 4. The `#fragment` is never sent to the server by HTTP protocol
 5. The receiver decrypts locally (CLI or browser via Web Crypto API)
 6. After the configured number of reads, the server permanently deletes the encrypted data
