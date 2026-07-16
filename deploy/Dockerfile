@@ -10,8 +10,11 @@ COPY . .
 RUN CGO_ENABLED=1 go build -o /kip-server ./server/cmd/server/
 
 FROM alpine:3.21
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates \
+    && adduser -D -u 1000 kip \
+    && mkdir /data && chown kip:kip /data
 COPY --from=builder /kip-server /usr/local/bin/kip-server
 
+USER kip
 EXPOSE 8080
 ENTRYPOINT ["kip-server"]

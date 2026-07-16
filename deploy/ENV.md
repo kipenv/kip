@@ -11,12 +11,25 @@ All configuration is via CLI flags. Environment variables are used in Docker Com
 | — | `-db` | `~/.local/share/kip/kip.db` | SQLite database path for teams |
 | — | `-rate-limit` | `30` | Max requests per minute per IP |
 
-## Docker Compose (production)
+## Docker Compose
+
+`deploy/docker-compose.yml` (local — publishes the port on the host):
 
 | Variable | Default | Description |
 |---|---|---|
 | `PORT` | `8080` | Host port to expose |
 | `RATE_LIMIT` | `30` | Max requests per minute per IP |
+
+`deploy/docker-compose.prod.yml` (production — no host ports, routed by
+Traefik/Dokploy; see the header comment in that file for domain setup):
+
+| Variable | Default | Description |
+|---|---|---|
+| `RATE_LIMIT` | `30` | Max requests per minute per IP |
+
+The web image bakes `PUBLIC_API_URL` in at build time (Astro). Leave it
+empty for the single-domain layout (decrypt page calls the API
+same-origin); set it only if the API lives on a different origin.
 
 ## Redis
 

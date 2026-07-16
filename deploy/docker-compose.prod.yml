@@ -1,0 +1,97 @@
+# Production compose for PaaS-style deploys (Dokploy, Coolify, plain VPS).
+#
+# Differences from docker-compose.yml (the local/dev stack):
+#   - No service publishes a host port. Both web and server join the
+#     external `dokploy-network` so Dokploy's Traefik routes to them by
+#     domain. Redis stays internal-only either way.
+#   - Teams SQLite lives on a named volume (-db /data/kip.db). Without it
+#     every redeploy would wipe all teams — secrets are fine (Redis has its
+#     own volume) but team membership is not ephemeral data.
+#
+# Single-domain layout (recommended — makes `kip push` links open in the
+# browser AND keeps the decrypt page same-origin, so no CORS and no
+# PUBLIC_API_URL to bake in). In Dokploy's Domains tab, add BOTH entries
+# on the same host:
+#   1. host: <your-domain>  path: /api     -> service `server`, port 8080
+#   2. host: <your-domain>  path: /health  -> service `server`, port 8080
+#   3. host: <your-domain>  path: /        -> service `web`,    port 80
+# Traefik gives longer path prefixes priority, so /api wins over /.
+# Point the CLI at the same domain: kip config --server https://<your-domain>
+#
+# Optional env: RATE_LIMIT (default 30 req/min/IP).
+
+services:
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+      # Leave PUBLIC_API_URL unset for the single-domain layout above.
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    networks:
+      - default
+      - dokploy-network
+
+  server:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    command:
+      - "kip-server"
+      - "-redis"
+      - "redis://redis:6379"
+      - "-db"
+      - "/data/kip.db"
+      - "-rate-limit"
+      - "${RATE_LIMIT:-30}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - kip-data:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    networks:
+      - default
+      - dokploy-network
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 320M
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  redis-data:
+  kip-data:

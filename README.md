@@ -213,36 +213,29 @@ kip diff
 
 kip is **free to self-host forever**. MIT License. Your data, your servers.
 
-```yaml
-# docker-compose.yml
-services:
-  kip:
-    image: ghcr.io/kipenv/kip-server:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - REDIS_URL=redis://redis:6379
-    volumes:
-      - kip-data:/data
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis-data:/data
-
-volumes:
-  redis-data:
-  kip-data:
-```
+The repo ships two compose files under `deploy/`:
 
 ```bash
-docker compose up -d
-kip config set server http://localhost:8080
+# Local / trying it out — publishes :8080 on the host
+docker compose -f deploy/docker-compose.yml up -d
+kip config --server http://localhost:8080
 ```
 
-That's it. No per-seat pricing. No license keys. SQLite for teams (embedded in the binary — no extra service), Redis for secrets. Mount a volume at `/data` if you want team state to persist across container restarts.
+For a real server, use `deploy/docker-compose.prod.yml`: it adds the static
+web (landing + browser decrypt page, served by nginx), keeps Redis and the
+API off the host network, and persists team state on a `/data` volume. It's
+written for [Dokploy](https://dokploy.com)/Traefik with a single-domain
+layout — `/api` and `/health` route to the Go server, everything else to
+the web — so the links `kip push` prints open in the browser and the
+decrypt page talks to the API same-origin (no CORS). Routing details are
+documented at the top of the file.
+
+```bash
+kip config --server https://your-domain.example
+```
+
+No per-seat pricing. No license keys. SQLite for teams (embedded in the
+binary — no extra service), Redis for secrets with native TTL.
 
 ---
 
