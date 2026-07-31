@@ -30,6 +30,7 @@ Thumbs.db
 # Internal planning docs
 BLUEPRINT.md
 DEVELOPMENT_PLAN.md
+CLAUDE.md
 
 # Project
 .env
