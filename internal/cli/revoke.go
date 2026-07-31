@@ -24,7 +24,7 @@ func newRevokeCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			if err := c.DeleteSecret(id); err != nil {
+			if err := c.DeleteSecret(cmd.Context(), id); err != nil {
 				return fmt.Errorf("revoke: %w", err)
 			}
 

@@ -76,7 +76,7 @@ func newPushCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			resp, err := c.CreateSecret(createReq)
+			resp, err := c.CreateSecret(cmd.Context(), createReq)
 			if err != nil {
 				return fmt.Errorf("upload: %w", err)
 			}

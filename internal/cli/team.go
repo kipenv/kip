@@ -44,7 +44,7 @@ func newTeamCreateCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			resp, err := c.CreateTeam(client.CreateTeamRequest{
+			resp, err := c.CreateTeam(cmd.Context(), client.CreateTeamRequest{
 				Name:     name,
 				Username: username,
 			})
@@ -77,7 +77,7 @@ func newTeamCreateCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&username, "username", "u", "", "your username in this team")
-	cmd.MarkFlagRequired("username")
+	_ = cmd.MarkFlagRequired("username")
 
 	return cmd
 }
@@ -101,7 +101,7 @@ func newTeamJoinCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			resp, err := c.JoinTeam(client.JoinTeamRequest{
+			resp, err := c.JoinTeam(cmd.Context(), client.JoinTeamRequest{
 				InviteCode: inviteCode,
 				Username:   username,
 			})
@@ -130,7 +130,7 @@ func newTeamJoinCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&username, "username", "u", "", "your username in this team")
-	cmd.MarkFlagRequired("username")
+	_ = cmd.MarkFlagRequired("username")
 
 	return cmd
 }
@@ -159,7 +159,7 @@ func newTeamLeaveCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			if err := c.LeaveTeam(entry.ID, entry.Token); err != nil {
+			if err := c.LeaveTeam(cmd.Context(), entry.ID, entry.Token); err != nil {
 				return fmt.Errorf("leave team: %w", err)
 			}
 
@@ -179,7 +179,7 @@ func newTeamListCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "ls",
 		Short: "List your teams",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			teams, err := config.LoadTeams()
 			if err != nil {
 				return fmt.Errorf("load teams config: %w", err)
@@ -223,7 +223,7 @@ func newTeamMembersCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			members, err := c.GetTeamMembers(entry.ID, entry.Token)
+			members, err := c.GetTeamMembers(cmd.Context(), entry.ID, entry.Token)
 			if err != nil {
 				return fmt.Errorf("get members: %w", err)
 			}

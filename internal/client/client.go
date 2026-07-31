@@ -3,6 +3,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,6 +25,34 @@ func New(baseURL string) *Client {
 			Timeout: 30 * time.Second,
 		},
 	}
+}
+
+// do issues a request against the server. A nil body sends no payload; an
+// empty token sends no Authorization header. The context lets callers cancel
+// in-flight requests (the CLI wires it to SIGINT).
+func (c *Client) do(ctx context.Context, method, path string, body []byte, token string) (*http.Response, error) {
+	var payload io.Reader
+	if body != nil {
+		payload = bytes.NewReader(body)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, payload)
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	return resp, nil
 }
 
 // CreateSecretRequest is the request body for creating a secret.
@@ -59,15 +88,15 @@ type ErrorResponse struct {
 }
 
 // CreateSecret uploads an encrypted secret to the server.
-func (c *Client) CreateSecret(req CreateSecretRequest) (*CreateSecretResponse, error) {
+func (c *Client) CreateSecret(ctx context.Context, req CreateSecretRequest) (*CreateSecretResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(c.baseURL+"/api/v1/secret", "application/json", bytes.NewReader(body))
+	resp, err := c.do(ctx, http.MethodPost, "/api/v1/secret", body, "")
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -84,10 +113,10 @@ func (c *Client) CreateSecret(req CreateSecretRequest) (*CreateSecretResponse, e
 }
 
 // GetSecret retrieves an encrypted secret from the server.
-func (c *Client) GetSecret(id string) (*GetSecretResponse, error) {
-	resp, err := c.httpClient.Get(c.baseURL + "/api/v1/secret/" + id)
+func (c *Client) GetSecret(ctx context.Context, id string) (*GetSecretResponse, error) {
+	resp, err := c.do(ctx, http.MethodGet, "/api/v1/secret/"+id, nil, "")
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -104,21 +133,17 @@ func (c *Client) GetSecret(id string) (*GetSecretResponse, error) {
 }
 
 // DeleteSecret revokes a secret by ID.
-func (c *Client) DeleteSecret(id string) error {
-	req, err := http.NewRequest(http.MethodDelete, c.baseURL+"/api/v1/secret/"+id, nil)
+func (c *Client) DeleteSecret(ctx context.Context, id string) error {
+	resp, err := c.do(ctx, http.MethodDelete, "/api/v1/secret/"+id, nil, "")
 	if err != nil {
-		return fmt.Errorf("create request: %w", err)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
 		return parseError(resp)
 	}
+
 	return nil
 }
 
@@ -158,15 +183,15 @@ type MemberInfo struct {
 }
 
 // CreateTeam creates a new team.
-func (c *Client) CreateTeam(req CreateTeamRequest) (*CreateTeamResponse, error) {
+func (c *Client) CreateTeam(ctx context.Context, req CreateTeamRequest) (*CreateTeamResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(c.baseURL+"/api/v1/teams", "application/json", bytes.NewReader(body))
+	resp, err := c.do(ctx, http.MethodPost, "/api/v1/teams", body, "")
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -183,15 +208,15 @@ func (c *Client) CreateTeam(req CreateTeamRequest) (*CreateTeamResponse, error) 
 }
 
 // JoinTeam joins a team by invite code.
-func (c *Client) JoinTeam(req JoinTeamRequest) (*JoinTeamResponse, error) {
+func (c *Client) JoinTeam(ctx context.Context, req JoinTeamRequest) (*JoinTeamResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(c.baseURL+"/api/v1/teams/join", "application/json", bytes.NewReader(body))
+	resp, err := c.do(ctx, http.MethodPost, "/api/v1/teams/join", body, "")
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -208,36 +233,25 @@ func (c *Client) JoinTeam(req JoinTeamRequest) (*JoinTeamResponse, error) {
 }
 
 // LeaveTeam leaves a team.
-func (c *Client) LeaveTeam(teamID, token string) error {
-	req, err := http.NewRequest(http.MethodDelete, c.baseURL+"/api/v1/teams/"+teamID+"/leave", nil)
+func (c *Client) LeaveTeam(ctx context.Context, teamID, token string) error {
+	resp, err := c.do(ctx, http.MethodDelete, "/api/v1/teams/"+teamID+"/leave", nil, token)
 	if err != nil {
-		return fmt.Errorf("create request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return parseError(resp)
 	}
+
 	return nil
 }
 
 // GetTeamMembers returns all members of a team.
-func (c *Client) GetTeamMembers(teamID, token string) ([]MemberInfo, error) {
-	req, err := http.NewRequest(http.MethodGet, c.baseURL+"/api/v1/teams/"+teamID+"/members", nil)
+func (c *Client) GetTeamMembers(ctx context.Context, teamID, token string) ([]MemberInfo, error) {
+	resp, err := c.do(ctx, http.MethodGet, "/api/v1/teams/"+teamID+"/members", nil, token)
 	if err != nil {
-		return nil, fmt.Errorf("create request: %w", err)
-	}
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 

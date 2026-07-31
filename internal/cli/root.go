@@ -11,6 +11,10 @@ func NewRootCmd() *cobra.Command {
 		Use:   "kip",
 		Short: "Secure .env file sharing with self-destructing links",
 		Long:  "kip — the missing CLI between pasting in Slack and deploying Vault.",
+		// A failed upload is not a usage mistake: don't dump the help text over
+		// it. Errors are printed once, by main.
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
 	cmd.AddCommand(

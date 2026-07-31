@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -44,7 +45,7 @@ func newPullCmd() *cobra.Command {
 			}
 
 			c := client.New(cfg.ServerURL)
-			resp, err := c.GetSecret(id)
+			resp, err := c.GetSecret(cmd.Context(), id)
 			if err != nil {
 				return fmt.Errorf("download: %w", err)
 			}
@@ -69,22 +70,10 @@ func newPullCmd() *cobra.Command {
 					}
 				}
 
-				salt, err := base64.StdEncoding.DecodeString(resp.Salt)
+				ciphertext, nonce, err = peelPasswordLayer(resp.Salt, ciphertext, nonce, pw)
 				if err != nil {
-					return fmt.Errorf("decode salt: %w", err)
+					return err
 				}
-
-				packed, err := crypto.DecryptWithPassword(ciphertext, nonce, salt, []byte(pw))
-				if err != nil {
-					return fmt.Errorf("wrong password or corrupted data")
-				}
-
-				// Unpack: nonce (12 bytes) + inner ciphertext
-				if len(packed) < crypto.NonceSize {
-					return fmt.Errorf("corrupted data after password decryption")
-				}
-				nonce = packed[:crypto.NonceSize]
-				ciphertext = packed[crypto.NonceSize:]
 			}
 
 			plaintext, err := crypto.Decrypt(ciphertext, nonce, key)
@@ -125,6 +114,27 @@ func newPullCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&password, "password", "p", "", "password for protected links")
 
 	return cmd
+}
+
+// peelPasswordLayer removes the Argon2id password layer applied by `push
+// --password`, returning the inner ciphertext and nonce that the URL key
+// decrypts. The password layer wraps `nonce + ciphertext` as a single blob.
+func peelPasswordLayer(encodedSalt string, ciphertext, nonce []byte, pw string) (innerCiphertext, innerNonce []byte, err error) {
+	salt, err := base64.StdEncoding.DecodeString(encodedSalt)
+	if err != nil {
+		return nil, nil, fmt.Errorf("decode salt: %w", err)
+	}
+
+	packed, err := crypto.DecryptWithPassword(ciphertext, nonce, salt, []byte(pw))
+	if err != nil {
+		return nil, nil, errors.New("wrong password or corrupted data")
+	}
+
+	if len(packed) < crypto.NonceSize {
+		return nil, nil, errors.New("corrupted data after password decryption")
+	}
+
+	return packed[crypto.NonceSize:], packed[:crypto.NonceSize], nil
 }
 
 // promptPassword asks the user for a password via stdin.

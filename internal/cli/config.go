@@ -25,7 +25,7 @@ func newConfigSetCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set",
 		Short: "Set configuration values",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			cfg, err := config.Load()
 			if err != nil {
 				return fmt.Errorf("load config: %w", err)
@@ -53,7 +53,7 @@ func newConfigGetCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get",
 		Short: "Show current configuration",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			cfg, err := config.Load()
 			if err != nil {
 				return fmt.Errorf("load config: %w", err)
