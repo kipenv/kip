@@ -6,11 +6,12 @@ import (
 	"database/sql"
 	_ "embed"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 //go:embed migrations/001_init.sql
@@ -28,7 +29,7 @@ func NewSQLiteStore(dbPath string) (*SQLiteStore, error) {
 		return nil, fmt.Errorf("open sqlite: %w", err)
 	}
 
-	if _, err := db.Exec(initSQL); err != nil {
+	if _, err := db.ExecContext(context.Background(), initSQL); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("run migrations: %w", err)
 	}
@@ -70,7 +71,7 @@ func (s *SQLiteStore) CreateTeam(ctx context.Context, input CreateTeamInput) (*C
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	now := time.Now().UTC()
 
@@ -109,7 +110,7 @@ func (s *SQLiteStore) JoinTeam(ctx context.Context, input JoinTeamInput) (*JoinT
 		"SELECT id, name, invite_code, created_at FROM teams WHERE invite_code = ?",
 		input.InviteCode).Scan(&team.ID, &team.Name, &team.InviteCode, &team.CreatedAt)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
 		return nil, err
@@ -144,21 +145,44 @@ func (s *SQLiteStore) LeaveTeam(ctx context.Context, teamID, memberID string) er
 	if err != nil {
 		return err
 	}
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
+	}
 	if rows == 0 {
 		return ErrNotFound
 	}
 
-	// Delete team if no members remain
+	// Delete the team once its last member leaves. A failed count must not be
+	// treated as "no members remain" — that would drop a team that still has
+	// members, along with its pins and share log.
 	var count int
-	s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM members WHERE team_id = ?", teamID).Scan(&count)
-	if count == 0 {
-		s.db.ExecContext(ctx, "DELETE FROM pins WHERE team_id = ?", teamID)
-		s.db.ExecContext(ctx, "DELETE FROM share_log WHERE team_id = ?", teamID)
-		s.db.ExecContext(ctx, "DELETE FROM teams WHERE id = ?", teamID)
+	if countErr := s.db.QueryRowContext(ctx,
+		"SELECT COUNT(*) FROM members WHERE team_id = ?", teamID).Scan(&count); countErr != nil {
+		return fmt.Errorf("count remaining members: %w", countErr)
+	}
+	if count > 0 {
+		return nil
 	}
 
-	return nil
+	// One transaction so the team never survives with its pins already gone.
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin cleanup: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	for _, query := range []string{
+		"DELETE FROM pins WHERE team_id = ?",
+		"DELETE FROM share_log WHERE team_id = ?",
+		"DELETE FROM teams WHERE id = ?",
+	} {
+		if _, err := tx.ExecContext(ctx, query, teamID); err != nil {
+			return fmt.Errorf("delete empty team: %w", err)
+		}
+	}
+
+	return tx.Commit()
 }
 
 func (s *SQLiteStore) GetTeamMembers(ctx context.Context, teamID string) ([]Member, error) {
@@ -187,7 +211,7 @@ func (s *SQLiteStore) GetMemberByToken(ctx context.Context, token string) (*Memb
 		"SELECT id, team_id, username, token, joined_at FROM members WHERE token = ?",
 		token).Scan(&m.ID, &m.TeamID, &m.Username, &m.Token, &m.JoinedAt)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
 		return nil, err
@@ -201,7 +225,7 @@ func (s *SQLiteStore) GetTeam(ctx context.Context, id string) (*Team, error) {
 		"SELECT id, name, invite_code, created_at FROM teams WHERE id = ?",
 		id).Scan(&t.ID, &t.Name, &t.InviteCode, &t.CreatedAt)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
 		return nil, err
@@ -367,7 +391,7 @@ func (s *SQLiteStore) GetPin(ctx context.Context, teamID, filename string) (*Pin
 		 FROM pins WHERE team_id = ? AND filename = ?`,
 		teamID, filename).Scan(&p.ID, &p.TeamID, &p.Filename, &p.Ciphertext, &p.Nonce, &p.PinnedBy, &p.UpdatedAt)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
 		return nil, err

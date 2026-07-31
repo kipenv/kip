@@ -64,7 +64,7 @@ func EncryptWithKey(plaintext, key []byte) (ciphertext, nonce []byte, err error)
 // The caller must store/transmit the salt alongside the ciphertext.
 func EncryptWithPassword(plaintext, password []byte) (ciphertext, nonce, salt []byte, err error) {
 	salt = make([]byte, SaltSize)
-	if _, err := readRand(salt); err != nil {
+	if _, err = readRand(salt); err != nil {
 		return nil, nil, nil, fmt.Errorf("encrypt with password: generate salt: %w", err)
 	}
 

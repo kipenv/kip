@@ -38,7 +38,9 @@ func newGenerateCmd() *cobra.Command {
 				return nil
 			}
 
-			if err := os.WriteFile(output, []byte(example), 0o644); err != nil {
+			// 0644 by design: .env.example holds keys with placeholder values —
+			// no secrets — and exists to be committed and read by the whole team.
+			if err := os.WriteFile(output, []byte(example), 0o644); err != nil { //nolint:gosec // see above
 				return fmt.Errorf("write file: %w", err)
 			}
 

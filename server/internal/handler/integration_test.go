@@ -170,7 +170,9 @@ func TestPasswordProtectedRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var createResp struct{ ID string `json:"id"` }
+	var createResp struct {
+		ID string `json:"id"`
+	}
 	json.NewDecoder(resp.Body).Decode(&createResp)
 	resp.Body.Close()
 

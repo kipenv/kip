@@ -27,7 +27,7 @@ func LoadProject() (*ProjectConfig, string, error) {
 		data, err := os.ReadFile(path)
 		if err == nil {
 			var cfg ProjectConfig
-			if err := json.Unmarshal(data, &cfg); err != nil {
+			if err = json.Unmarshal(data, &cfg); err != nil {
 				return nil, "", err
 			}
 			return &cfg, path, nil
@@ -53,7 +53,9 @@ func SaveProject(dir string, cfg ProjectConfig) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path, os.WriteFile(path, data, 0o644)
+	// 0600: .kip identifies the team this directory belongs to. Same treatment
+	// as the other kip-owned files (config.json, teams.json).
+	return path, os.WriteFile(path, data, 0o600)
 }
 
 // AddToGitignore adds .kip to the .gitignore file in the given directory.
@@ -77,7 +79,9 @@ func AddToGitignore(dir string) error {
 	}
 	content += projectFile + "\n"
 
-	return os.WriteFile(gitignorePath, []byte(content), 0o644)
+	// 0644 by design: .gitignore is a shared, committed file that git and every
+	// other tool on the machine must be able to read.
+	return os.WriteFile(gitignorePath, []byte(content), 0o644) //nolint:gosec // see above
 }
 
 // AddToGitExclude adds .kip to .git/info/exclude.
@@ -106,7 +110,8 @@ func AddToGitExclude(dir string) error {
 	}
 	content += projectFile + "\n"
 
-	return os.WriteFile(excludePath, []byte(content), 0o644)
+	// 0644 by design: git reads .git/info/exclude directly.
+	return os.WriteFile(excludePath, []byte(content), 0o644) //nolint:gosec // see above
 }
 
 func splitLines(s string) []string {

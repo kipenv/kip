@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/kipenv/kip/server/internal/handler"
 	"github.com/kipenv/kip/server/internal/middleware"
@@ -14,6 +15,16 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+// run wires up the stores, routes and server. It exists so that deferred
+// cleanup (Redis and SQLite connections) actually runs on failure — os.Exit
+// in main would skip it.
+func run() error {
 	addr := flag.String("addr", ":8080", "listen address")
 	redisURL := flag.String("redis", "", "redis URL (e.g. redis://localhost:6379). If empty, uses in-memory store")
 	dbPath := flag.String("db", "", "SQLite database path. If empty, uses ~/.local/share/kip/kip.db")
@@ -27,8 +38,7 @@ func main() {
 	if *redisURL != "" {
 		rs, err := store.NewRedisStore(*redisURL)
 		if err != nil {
-			logger.Error("failed to connect to redis", "error", err)
-			os.Exit(1)
+			return fmt.Errorf("connect to redis: %w", err)
 		}
 		defer rs.Close()
 		secretStore = rs
@@ -41,22 +51,19 @@ func main() {
 	// Team store (SQLite)
 	sqlitePath := *dbPath
 	if sqlitePath == "" {
-		dataDir, err := os.UserHomeDir()
+		home, err := os.UserHomeDir()
 		if err != nil {
-			logger.Error("failed to get home directory", "error", err)
-			os.Exit(1)
+			return fmt.Errorf("resolve home directory: %w", err)
 		}
-		sqlitePath = filepath.Join(dataDir, ".local", "share", "kip", "kip.db")
+		sqlitePath = filepath.Join(home, ".local", "share", "kip", "kip.db")
 	}
 	if err := os.MkdirAll(filepath.Dir(sqlitePath), 0o700); err != nil {
-		logger.Error("failed to create data directory", "error", err)
-		os.Exit(1)
+		return fmt.Errorf("create data directory: %w", err)
 	}
 
 	teamStore, err := store.NewSQLiteStore(sqlitePath)
 	if err != nil {
-		logger.Error("failed to open sqlite", "error", err)
-		os.Exit(1)
+		return fmt.Errorf("open sqlite: %w", err)
 	}
 	defer teamStore.Close()
 	logger.Info("using sqlite store", "path", sqlitePath)
@@ -87,7 +94,7 @@ func main() {
 	mux.HandleFunc("GET /api/v1/teams/{id}/pin", shareHandler.PinGet)
 
 	// Health
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, `{"status":"ok"}`)
 	})
@@ -97,9 +104,22 @@ func main() {
 	h = middleware.RateLimit(*rateLimit)(h)
 	h = middleware.Logger(logger)(h)
 
-	logger.Info("server starting", "addr", *addr)
-	if err := http.ListenAndServe(*addr, h); err != nil {
-		logger.Error("server failed", "error", err)
-		os.Exit(1)
+	// Explicit timeouts: the zero-value http.Server has none, which lets a
+	// slow client hold a connection open indefinitely (Slowloris). Payloads
+	// here are small encrypted blobs, so these limits are generous.
+	srv := &http.Server{
+		Addr:              *addr,
+		Handler:           h,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
 	}
+
+	logger.Info("server starting", "addr", *addr)
+	if err := srv.ListenAndServe(); err != nil {
+		return fmt.Errorf("server failed: %w", err)
+	}
+
+	return nil
 }

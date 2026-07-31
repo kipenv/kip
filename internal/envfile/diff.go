@@ -2,16 +2,16 @@ package envfile
 
 // DiffResult contains the result of comparing two env maps.
 type DiffResult struct {
-	Missing []string            // Keys in remote but not in local
-	Extra   []string            // Keys in local but not in remote
-	Changed []DiffChange        // Keys present in both but with different values
-	Same    []string            // Keys with identical values
+	Missing []string     // Keys in remote but not in local
+	Extra   []string     // Keys in local but not in remote
+	Changed []DiffChange // Keys present in both but with different values
+	Same    []string     // Keys with identical values
 }
 
 // DiffChange represents a key whose value differs between local and remote.
 type DiffChange struct {
-	Key        string
-	LocalValue string
+	Key         string
+	LocalValue  string
 	RemoteValue string
 }
 
@@ -22,15 +22,16 @@ func Diff(local, remote map[string]string) DiffResult {
 	// Find missing and changed keys
 	for key, remoteVal := range remote {
 		localVal, exists := local[key]
-		if !exists {
+		switch {
+		case !exists:
 			result.Missing = append(result.Missing, key)
-		} else if localVal != remoteVal {
+		case localVal != remoteVal:
 			result.Changed = append(result.Changed, DiffChange{
 				Key:         key,
 				LocalValue:  localVal,
 				RemoteValue: remoteVal,
 			})
-		} else {
+		default:
 			result.Same = append(result.Same, key)
 		}
 	}

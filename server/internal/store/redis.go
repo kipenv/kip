@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -78,12 +79,12 @@ func (s *RedisStore) Get(ctx context.Context, id string) (*Secret, error) {
 	var secret Secret
 
 	err := s.client.Watch(ctx, func(tx *redis.Tx) error {
-		data, err := tx.Get(ctx, key).Bytes()
-		if err != nil {
-			if err == redis.Nil {
+		data, getErr := tx.Get(ctx, key).Bytes()
+		if getErr != nil {
+			if errors.Is(getErr, redis.Nil) {
 				return ErrNotFound
 			}
-			return fmt.Errorf("redis get: %w", err)
+			return fmt.Errorf("redis get: %w", getErr)
 		}
 
 		if err := json.Unmarshal(data, &secret); err != nil {
@@ -92,7 +93,7 @@ func (s *RedisStore) Get(ctx context.Context, id string) (*Secret, error) {
 
 		secret.ReadsLeft--
 
-		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+		_, pipeErr := tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
 			if secret.ReadsLeft <= 0 {
 				pipe.Del(ctx, key)
 			} else {
@@ -106,9 +107,8 @@ func (s *RedisStore) Get(ctx context.Context, id string) (*Secret, error) {
 			return nil
 		})
 
-		return err
+		return pipeErr
 	}, key)
-
 	if err != nil {
 		return nil, err
 	}

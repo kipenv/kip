@@ -32,9 +32,9 @@ func NewSecretHandler(s store.SecretStore, logger *slog.Logger) *SecretHandler {
 
 // CreateRequest is the JSON body for creating a secret.
 type CreateRequest struct {
-	Ciphertext        string `json:"ciphertext"`         // base64 encoded
-	Nonce             string `json:"nonce"`               // base64 encoded
-	Salt              string `json:"salt,omitempty"`       // base64 encoded, for password-protected
+	Ciphertext        string `json:"ciphertext"`     // base64 encoded
+	Nonce             string `json:"nonce"`          // base64 encoded
+	Salt              string `json:"salt,omitempty"` // base64 encoded, for password-protected
 	Filename          string `json:"filename"`
 	MaxReads          int    `json:"max_reads"`
 	TTLSeconds        int    `json:"ttl_seconds"`
@@ -49,9 +49,9 @@ type CreateResponse struct {
 
 // GetResponse is the JSON response when retrieving a secret.
 type GetResponse struct {
-	Ciphertext        string `json:"ciphertext"`                    // base64 encoded
-	Nonce             string `json:"nonce"`                         // base64 encoded
-	Salt              string `json:"salt,omitempty"`                 // base64 encoded
+	Ciphertext        string `json:"ciphertext"`     // base64 encoded
+	Nonce             string `json:"nonce"`          // base64 encoded
+	Salt              string `json:"salt,omitempty"` // base64 encoded
 	Filename          string `json:"filename"`
 	ReadsLeft         int    `json:"reads_left"`
 	PasswordProtected bool   `json:"password_protected,omitempty"`

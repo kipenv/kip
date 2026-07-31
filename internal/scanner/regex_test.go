@@ -92,8 +92,8 @@ func TestWeakValues(t *testing.T) {
 
 func TestShortSecrets(t *testing.T) {
 	tests := []struct {
-		key      string
-		value    string
+		key       string
+		value     string
 		warnShort bool
 	}{
 		{"API_SECRET", "abc", true},
@@ -169,8 +169,10 @@ func TestScanRealisticEnv(t *testing.T) {
 		}
 	}
 
-	mustWarn := []string{"AWS_ACCESS_KEY_ID", "STRIPE_SECRET_KEY", "GITHUB_TOKEN",
-		"DB_PASSWORD", "API_SECRET", "APP_URL", "TLS_KEY"}
+	mustWarn := []string{
+		"AWS_ACCESS_KEY_ID", "STRIPE_SECRET_KEY", "GITHUB_TOKEN",
+		"DB_PASSWORD", "API_SECRET", "APP_URL", "TLS_KEY",
+	}
 	for _, key := range mustWarn {
 		if !warnKeys[key] {
 			t.Errorf("expected warning for %s, but got none", key)
