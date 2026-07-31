@@ -33,10 +33,10 @@ jobs:
           sudo apt-get install -y gcc
 
       - name: Build CLI
-        run: go build -o bin/envshare ./cmd/envshare/
+        run: go build -o bin/kip ./cmd/kip/
 
       - name: Build server
-        run: CGO_ENABLED=1 go build -o bin/envshare-server ./server/cmd/server/
+        run: CGO_ENABLED=1 go build -o bin/kip-server ./server/cmd/server/
 
       - name: Test
         run: go test -race -coverprofile=coverage.out ./...
@@ -59,4 +59,5 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          # Pinned: `latest` silently jumped to v2 and broke the config format.
+          version: v2.12

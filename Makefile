@@ -1,10 +1,10 @@
 .PHONY: build test lint server dev clean
 
-BINARY=bin/envshare
-SERVER_BINARY=bin/envshare-server
+BINARY=bin/kip
+SERVER_BINARY=bin/kip-server
 
 build:
-	go build -o $(BINARY) ./cmd/envshare/
+	go build -o $(BINARY) ./cmd/kip/
 
 server-build:
 	go build -o $(SERVER_BINARY) ./server/cmd/server/
