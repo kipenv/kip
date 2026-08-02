@@ -14,6 +14,10 @@ import (
 	"github.com/kipenv/kip/server/internal/store"
 )
 
+// Stamped in at release time via -ldflags "-X main.version=...".
+// See .goreleaser.yml; a plain `go build` keeps the placeholder.
+var version = "dev"
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -116,7 +120,7 @@ func run() error {
 		IdleTimeout:       60 * time.Second,
 	}
 
-	logger.Info("server starting", "addr", *addr)
+	logger.Info("server starting", "addr", *addr, "version", version)
 	if err := srv.ListenAndServe(); err != nil {
 		return fmt.Errorf("server failed: %w", err)
 	}

@@ -10,6 +10,13 @@ import (
 	"github.com/kipenv/kip/internal/cli"
 )
 
+// Stamped in at release time via -ldflags "-X main.version=... -X main.commit=...".
+// See .goreleaser.yml; a plain `go build` keeps these placeholders.
+var (
+	version = "dev"
+	commit  = "none"
+)
+
 func main() {
 	os.Exit(run())
 }
@@ -23,7 +30,7 @@ func run() int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := cli.NewRootCmd().ExecuteContext(ctx); err != nil {
+	if err := cli.NewRootCmd(version, commit).ExecuteContext(ctx); err != nil {
 		// On interrupt the surfacing error is whatever the in-flight call
 		// reported (wrapped in *url.Error, etc.), so ask the context rather
 		// than trying to unwrap down to context.Canceled.
