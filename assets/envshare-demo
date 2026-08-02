@@ -1,9 +1,0 @@
-#!/bin/bash
-# Wrapper for GIF recording:
-# - push: replaces localhost:8080 → envshare.dev in output
-# - pull: replaces envshare.dev → localhost:8080 in args, then envshare.dev in output
-ARGS=("$@")
-for i in "${!ARGS[@]}"; do
-  ARGS[$i]="${ARGS[$i]//https:\/\/envshare.dev/http:\/\/localhost:8080}"
-done
-~/proyectos/envshares/envshare/bin/envshare "${ARGS[@]}" 2>&1 | sed 's|http://localhost:8080|https://envshare.dev|g'

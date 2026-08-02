@@ -31,6 +31,13 @@ Thumbs.db
 BLUEPRINT.md
 DEVELOPMENT_PLAN.md
 CLAUDE.md
+docs/LAUNCH-CHECKLIST.md
+
+# Demo recording intermediates — regenerated from the tapes, not source
+assets/*.mp4
+assets/*.mov
+assets/arrows.gif
+assets/test-visual.gif
 
 # Project
 .env

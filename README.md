@@ -14,8 +14,6 @@ Share encrypted secrets with self-destructing links. One command. No accounts. Z
 
 [Website](https://kipenv.dev) · [Install](#install) · [How It Works](#how-it-works) · [Self-Host](#self-hosting) · [Security](#security)
 
-<img src="assets/demo-split.gif" alt="kip demo — push on one machine, pull on another" width="700" />
-
 </div>
 
 ---
