@@ -45,11 +45,11 @@ internal/
   crypto/           AES-256-GCM encryption/decryption
   client/           HTTP client for the server API
   config/           Local config + .kip file handling
-  scanner/          Security scan (regex + AI)
+  scanner/          Secret pattern scanner (regex)
   envfile/          .env parsing and utilities
 server/             API server (Go stdlib net/http)
 web/                Astro + Vue landing page + decrypt page
-deploy/             Docker, docker-compose, fly.toml
+deploy/             Dockerfile, docker-compose files, deploy docs
 ```
 
 ## Code Style

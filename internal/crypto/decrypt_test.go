@@ -98,7 +98,7 @@ func TestDecryptKnownVector(t *testing.T) {
 	// We encrypt with known key/nonce and verify round-trip.
 	key, _ := hex.DecodeString("0000000000000000000000000000000000000000000000000000000000000001")
 	nonce, _ := hex.DecodeString("000000000000000000000001")
-	plaintext := []byte("Hello, EnvShare!")
+	plaintext := []byte("Hello, kip!")
 
 	block, err := aes.NewCipher(key)
 	if err != nil {

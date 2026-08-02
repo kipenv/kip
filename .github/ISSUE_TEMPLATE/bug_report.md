@@ -28,7 +28,7 @@ What happened instead?
 
 - **OS:** (e.g., Ubuntu 24.04, macOS 15, Windows 11)
 - **Go version:** (e.g., 1.26.1)
-- **envshare version:** (`envshare --version`)
+- **kip version:** (`kip --version`)
 - **Install method:** (brew, go install, curl, source)
 - **Self-hosted?** (yes/no — if yes, Docker version?)
 
