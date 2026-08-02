@@ -10,10 +10,10 @@ const steps = [
   {
     icon: Lock,
     title: 'Push your .env',
-    desc: 'EnvShare encrypts your file locally with a unique random key. That key never touches our server.',
-    code: '<span class="text-hi">$</span> envshare push .env\n<span class="text-t3">  --expires 24h --reads 1</span>',
+    desc: 'kip encrypts your file locally with a unique random key. That key never touches our server.',
+    code: '<span class="text-hi">$</span> kip push .env\n<span class="text-t3">  --ttl 86400 --reads 1</span>',
     terminal: `<div class="text-t3"># Encrypt &amp; upload</div>
-<div><span class="text-hi">$</span> <span class="text-t1">envshare push .env --expires 24h</span></div>
+<div><span class="text-hi">$</span> <span class="text-t1">kip push .env --ttl 86400</span></div>
 <br>
 <div class="text-t3">  Generating AES-256-GCM key...  <span class="text-emerald">done</span></div>
 <div class="text-t3">  Encrypting file locally...     <span class="text-emerald">done</span></div>
@@ -21,7 +21,7 @@ const steps = [
 <br>
 <div class="text-emerald">  ✓ Ready to share</div>
 <br>
-<div>  <span class="text-sky">Link:</span>  <span class="text-amber">https://envshare.dev/s/k9xm2p</span><span class="text-hi">#AZ7kQ...</span></div>
+<div>  <span class="text-sky">Link:</span>  <span class="text-amber">https://kip.example.com/s/k9xm2p</span><span class="text-hi">#AZ7kQ...</span></div>
 <div>  <span class="text-t3">TTL:</span>   <span class="text-amber">24 hours</span></div>
 <div>  <span class="text-t3">Reads:</span> <span class="text-t2">1 (self-destructs on open)</span></div>`,
   },
@@ -29,10 +29,10 @@ const steps = [
     icon: Link,
     title: 'Share the link',
     desc: 'The decryption key lives in the URL #fragment — browsers never send that to servers. It\'s an HTTP protocol guarantee.',
-    code: '<span class="text-amber">https://envshare.dev/s/</span><span class="text-hi">k9xm2p<span class="text-amber">#</span>AZ7k...</span>',
+    code: '<span class="text-amber">https://kip.example.com/s/</span><span class="text-hi">k9xm2p<span class="text-amber">#</span>AZ7k...</span>',
     terminal: `<div class="text-t3"># URL anatomy</div>
 <br>
-<div class="text-t1">  https://envshare.dev/s/<span class="text-amber">k9xm2p</span><span class="text-hi">#AZ7kQR...</span></div>
+<div class="text-t1">  https://kip.example.com/s/<span class="text-amber">k9xm2p</span><span class="text-hi">#AZ7kQR...</span></div>
 <br>
 <div class="text-t3">  ├─ server sees: <span class="text-t2">/s/k9xm2p</span></div>
 <div class="text-t3">  │  (encrypted blob ID)</div>
@@ -47,9 +47,9 @@ const steps = [
     icon: Flame,
     title: 'It self-destructs',
     desc: 'After the configured reads, the encrypted blob is permanently deleted. TTL ensures deletion even if nobody reads it.',
-    code: '<span class="text-hi">$</span> envshare pull <span class="text-amber">https://...</span>\n<span class="text-t3">  ✓ Saved → .env · Link destroyed</span>',
+    code: '<span class="text-hi">$</span> kip pull <span class="text-amber">https://...</span>\n<span class="text-t3">  ✓ Saved → .env · Link destroyed</span>',
     terminal: `<div class="text-t3"># Receiver pulls the file</div>
-<div><span class="text-hi">$</span> <span class="text-t1">envshare pull https://envshare.dev/s/k9xm2p#AZ7k...</span></div>
+<div><span class="text-hi">$</span> <span class="text-t1">kip pull https://kip.example.com/s/k9xm2p#AZ7k...</span></div>
 <br>
 <div class="text-t3">  Fetching encrypted payload...   <span class="text-emerald">done</span></div>
 <div class="text-t3">  Extracting key from URL...      <span class="text-emerald">done</span></div>

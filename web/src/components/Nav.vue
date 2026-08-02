@@ -12,7 +12,7 @@ function onScroll() {
 }
 
 function copyInstall() {
-  navigator.clipboard.writeText('brew install envshare').then(() => {
+  navigator.clipboard.writeText('go install github.com/kipenv/kip/cmd/kip@latest').then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
   })
@@ -42,16 +42,15 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <!-- Logo -->
         <a href="/" class="flex items-center gap-2 font-mono font-bold text-sm tracking-wide text-t1">
           <span class="w-2 h-2 rounded-full bg-hi pulse-glow" />
-          envshare
+          kip
         </a>
 
         <!-- Desktop links -->
         <div class="hidden md:flex items-center gap-8">
           <a href="#how" class="text-[13px] text-t3 hover:text-t2 transition-colors">How it works</a>
           <a href="#features" class="text-[13px] text-t3 hover:text-t2 transition-colors">Features</a>
-          <a href="#pricing" class="text-[13px] text-t3 hover:text-t2 transition-colors">Pricing</a>
           <a href="#selfhost" class="text-[13px] text-t3 hover:text-t2 transition-colors">Self-host</a>
-          <a href="https://github.com/antoniojosev/envshare" target="_blank" rel="noopener" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
+          <a href="https://github.com/kipenv/kip" target="_blank" rel="noopener" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
         </div>
 
         <!-- Desktop CTA -->
@@ -61,10 +60,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
             class="font-mono text-[11px] bg-s3 border border-b2 px-3.5 py-1.5 rounded-lg text-t3 flex items-center gap-2 hover:border-hi/40 hover:text-hi transition-all cursor-pointer"
           >
             <span class="text-hi">$</span>
-            {{ copied ? 'Copied!' : 'brew install envshare' }}
+            {{ copied ? 'Copied!' : 'go install \u2026/kip@latest' }}
           </button>
           <a
-            href="#pricing"
+            href="#selfhost"
             class="bg-accent text-accent-text font-semibold text-[13px] px-5 py-2 rounded-lg hover:bg-accent-hover hover:-translate-y-px transition-all"
           >
             Get started
@@ -100,10 +99,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         >
           <a href="#how" @click="mobileOpen = false" class="block text-t2 hover:text-t1">How it works</a>
           <a href="#features" @click="mobileOpen = false" class="block text-t2 hover:text-t1">Features</a>
-          <a href="#pricing" @click="mobileOpen = false" class="block text-t2 hover:text-t1">Pricing</a>
           <a href="#selfhost" @click="mobileOpen = false" class="block text-t2 hover:text-t1">Self-host</a>
           <a
-            href="#pricing"
+            href="#selfhost"
             @click="mobileOpen = false"
             class="block w-full text-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-accent-text"
           >

@@ -1,17 +1,17 @@
 <script setup lang="ts">
 const rows = [
-  { feature: 'Native CLI', envshare: 'YES', slack: 'NO', yopass: 'NO', doppler: 'YES' },
-  { feature: 'Zero-knowledge encryption', envshare: 'YES', slack: 'NO', yopass: 'PARTIAL', doppler: 'NO' },
-  { feature: 'Self-destructing links', envshare: 'YES', slack: 'NO', yopass: 'YES', doppler: 'NO' },
-  { feature: 'Self-hostable (free)', envshare: 'YES', slack: 'NO', yopass: 'YES', doppler: 'NO' },
-  { feature: 'Receiver needs account', envshare: 'NO', slack: 'NO', yopass: 'NO', doppler: 'YES' },
-  { feature: 'Lightweight teams', envshare: 'YES', slack: 'YES', yopass: 'NO', doppler: 'YES' },
-  { feature: 'AI secret scan', envshare: 'YES', slack: 'NO', yopass: 'NO', doppler: 'PARTIAL' },
-  { feature: 'Starts at', envshare: 'FREE', slack: 'FREE', yopass: 'FREE', doppler: '$21/user/mo' },
+  { feature: 'Native CLI', kip: 'YES', slack: 'NO', yopass: 'NO', doppler: 'YES' },
+  { feature: 'Zero-knowledge encryption', kip: 'YES', slack: 'NO', yopass: 'PARTIAL', doppler: 'NO' },
+  { feature: 'Self-destructing links', kip: 'YES', slack: 'NO', yopass: 'YES', doppler: 'NO' },
+  { feature: 'Self-hostable (free)', kip: 'YES', slack: 'NO', yopass: 'YES', doppler: 'NO' },
+  { feature: 'Receiver needs account', kip: 'NO', slack: 'NO', yopass: 'NO', doppler: 'YES' },
+  { feature: 'Lightweight teams', kip: 'YES', slack: 'YES', yopass: 'NO', doppler: 'YES' },
+  { feature: 'Secret scanning', kip: 'YES', slack: 'NO', yopass: 'NO', doppler: 'PARTIAL' },
+  { feature: 'Starts at', kip: 'FREE', slack: 'FREE', yopass: 'FREE', doppler: '$21/user/mo' },
 ]
 
-function cls(val: string, isEnvshare: boolean) {
-  if (isEnvshare) return 'text-hi font-semibold'
+function cls(val: string, isKip: boolean) {
+  if (isKip) return 'text-hi font-semibold'
   if (val === 'YES' || val === 'FREE') return 'text-emerald'
   if (val === 'PARTIAL') return 'text-amber'
   return 'text-t3'
@@ -32,7 +32,7 @@ function cls(val: string, isEnvshare: boolean) {
             <tr>
               <th class="bg-s3 px-5 py-4 text-left font-mono text-xs uppercase tracking-wider text-t2 border-b border-b1">Feature</th>
               <th class="bg-s3 px-5 py-4 text-left font-mono text-xs uppercase tracking-wider border-b border-b1">
-                <span class="flex items-center gap-1.5 text-hi font-semibold"><span class="w-2 h-2 rounded-full bg-hi" />envshare</span>
+                <span class="flex items-center gap-1.5 text-hi font-semibold"><span class="w-2 h-2 rounded-full bg-hi" />kip</span>
               </th>
               <th class="bg-s3 px-5 py-4 text-left font-mono text-xs uppercase tracking-wider text-t3 border-b border-b1">Slack DM</th>
               <th class="bg-s3 px-5 py-4 text-left font-mono text-xs uppercase tracking-wider text-t3 border-b border-b1">Yopass</th>
@@ -47,7 +47,7 @@ function cls(val: string, isEnvshare: boolean) {
               :class="i % 2 === 0 ? 'bg-hi/[0.02]' : ''"
             >
               <td class="px-5 py-4 text-[13px] text-t2 border-b border-b1">{{ row.feature }}</td>
-              <td class="px-5 py-4 text-[11px] font-mono border-b border-b1" :class="cls(row.envshare, true)">{{ row.envshare }}</td>
+              <td class="px-5 py-4 text-[11px] font-mono border-b border-b1" :class="cls(row.kip, true)">{{ row.kip }}</td>
               <td class="px-5 py-4 text-[11px] font-mono border-b border-b1" :class="cls(row.slack, false)">{{ row.slack }}</td>
               <td class="px-5 py-4 text-[11px] font-mono border-b border-b1" :class="cls(row.yopass, false)">{{ row.yopass }}</td>
               <td class="px-5 py-4 text-[11px] font-mono border-b border-b1" :class="cls(row.doppler, false)">{{ row.doppler }}</td>

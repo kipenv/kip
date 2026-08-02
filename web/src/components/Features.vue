@@ -9,7 +9,7 @@ const features = [
   { icon: Timer, title: 'Self-destructing links', desc: 'Configure TTL and max reads independently. Links die after use — Redis TTL guarantees it.' },
   { icon: Users, title: 'Lightweight teams', desc: 'Teams work like game lobbies. Create, share an invite code, done. No admin panels, no RBAC.' },
   { icon: Globe, title: 'Web decrypt page', desc: 'Receivers don\'t need the CLI. Open the link in a browser — decryption happens client-side.' },
-  { icon: Bot, title: 'AI secret scan', desc: 'Regex patterns detect AWS keys, Stripe keys, GitHub tokens. BYO AI for deeper analysis.' },
+  { icon: Bot, title: 'Secret scanning', desc: 'Offline regex patterns flag AWS and Stripe keys, GitHub tokens and weak secrets before you share.' },
   { icon: Container, title: 'Self-host in 30 seconds', desc: 'Docker Compose. Server + Redis + SQLite in one file. No cloud lock-in. Free forever.' },
 ]
 </script>

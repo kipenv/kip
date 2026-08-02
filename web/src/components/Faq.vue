@@ -4,10 +4,10 @@ import { ref } from 'vue'
 const faqs = [
   { q: 'What happens if the server is compromised?', a: 'Attackers get encrypted blobs and nonces. Without the key (which lives only in your URL fragment, never on our server), they decrypt to garbage. This isn\'t a policy — it\'s a cryptographic guarantee.' },
   { q: 'Does the receiver need to install anything?', a: 'No. They can open the link in a browser. Decryption happens client-side with the Web Crypto API. The key in the URL fragment is never sent to our server. They can optionally install the CLI for a faster workflow.' },
-  { q: 'What\'s the difference between Free and Pro?', a: 'Free gives you unlimited links with 24h max TTL and 3 reads per link. Pro unlocks 30-day TTL, configurable reads, password-protected links, teams, and included AI scan. No link quantity limits on either tier.' },
+  { q: 'What does it cost?', a: 'Nothing. kip is MIT-licensed and self-hosted: you run the server, you own the data, and there are no tiers, seats or quotas to hit. TTL and read count are yours to set per link.' },
   { q: 'Can I self-host for my company?', a: 'Yes, and it\'s free forever. MIT License. The server + Redis + SQLite runs with one Docker Compose file. You own the data, the server, and the crypto keys. No seat-based pricing, ever.' },
-  { q: 'How do teams work?', a: 'Teams are like game lobbies. You create one, share an invite code, and members join. No admin panels, no complex roles. You can push to the whole team or a specific member, pin an "official" .env, and see the inbox of pending shares.' },
-  { q: 'What does the AI scan actually do?', a: 'Before sharing, it scans your .env for live production keys (AWS, Stripe, GitHub tokens), weak secrets, and URLs pointing to prod systems. Regex patterns run locally, always free. Connect your own AI for deeper analysis. Pro tier includes cloud AI.' },
+  { q: 'How do teams work?', a: 'Teams are like game lobbies. You create one, share an invite code, and members join \u2014 no admin panels, no roles. Today the CLI covers membership: create, join, list, leave. Team-scoped sharing (push to everyone or one member, a pinned "official" .env, an inbox of pending shares) is implemented and tested in the API, but the CLI does not expose it yet.' },
+  { q: 'What does the secret scan actually do?', a: 'Before sharing, kip scan checks your .env for live production credentials (AWS, Stripe, GitHub tokens) and weak secrets. It runs entirely offline with regex patterns \u2014 no network, no API keys. Optional LLM-assisted scanning is on the roadmap.' },
 ]
 
 const openIndex = ref<number | null>(null)

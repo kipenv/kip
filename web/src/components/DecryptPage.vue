@@ -23,12 +23,16 @@ const content = ref('')
 const copied = ref(false)
 const copiedInstall = ref(false)
 const revealContent = ref(false)
+// The fetched (still encrypted) secret, held between the initial fetch and the
+// password prompt. Component state, not a window global: nothing about a secret
+// belongs on an object every script on the page can reach.
+const pendingSecret = ref<import('../lib/crypto').SecretResponse | null>(null)
 const showInstallModal = ref(false)
 
 const installMethods = [
-  { label: 'Homebrew', command: 'brew install envshare' },
-  { label: 'Go', command: 'go install github.com/antoniojosev/envshare@latest' },
-  { label: 'curl', command: 'curl -fsSL https://envshare.dev/install.sh | sh' },
+  { label: 'Homebrew', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
+  { label: 'Go', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
+  { label: 'curl', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
 ]
 const activeInstall = ref(0)
 
@@ -89,12 +93,15 @@ async function submitPassword() {
     return
   }
 
-  // Real decrypt would go here
   try {
     const { decryptSecret } = await import('../lib/crypto')
     const hash = window.location.hash.slice(1)
-    const secretData = (window as any).__SECRET_DATA__
-    const result = await decryptSecret(hash, secretData, password.value)
+    if (!pendingSecret.value) {
+      errorType.value = 'SERVER_ERROR'
+      state.value = 'error'
+      return
+    }
+    const result = await decryptSecret(hash, pendingSecret.value, password.value)
     content.value = result
     state.value = 'success'
   } catch {
@@ -120,7 +127,7 @@ async function runDemo() {
   readsLeft.value = 0
   wasLastRead.value = true
   content.value = `# Database
-DATABASE_URL=postgresql://admin:s3cret@db.internal:5432/envshare_prod
+DATABASE_URL=postgresql://admin:s3cret@db.internal:5432/myapp_prod
 DATABASE_POOL_SIZE=25
 
 # Redis
@@ -138,7 +145,7 @@ SESSION_SECRET=a7f2e9c1d4b8••••••••
 AWS_ACCESS_KEY_ID=AKIA••••••••••••
 AWS_SECRET_ACCESS_KEY=wJal••••••••••••••••••••
 AWS_REGION=us-east-1
-S3_BUCKET=envshare-uploads-prod
+S3_BUCKET=myapp-uploads-prod
 
 # Monitoring
 SENTRY_DSN=https://abc123@sentry.io/456
@@ -147,7 +154,7 @@ LOG_LEVEL=warn
 # App
 PORT=8080
 NODE_ENV=production
-API_BASE_URL=https://api.envshare.dev`
+API_BASE_URL=https://api.myapp.com`
 }
 
 async function runRealDecrypt() {
@@ -163,8 +170,8 @@ async function runRealDecrypt() {
     const apiBase = import.meta.env.PUBLIC_API_URL || ''
     const secret = await fetchSecret(apiBase, parsed.id)
 
-    // Store for password flow
-    ;(window as any).__SECRET_DATA__ = secret
+    // Kept for the password flow below
+    pendingSecret.value = secret
     filename.value = secret.filename || '.env'
     readsLeft.value = secret.reads_left
     wasLastRead.value = secret.reads_left === 0
@@ -205,7 +212,7 @@ onMounted(() => {
     <nav class="px-4 sm:px-6 lg:px-12 flex items-center justify-between border-b border-b1 gap-3" style="height: 3.5rem; min-height: 3.5rem;">
       <a href="/" class="flex items-center gap-2 font-mono font-bold text-sm tracking-wide text-t1 shrink-0">
         <span class="rounded-full bg-hi pulse-glow" style="width: .5rem; height: .5rem;" />
-        envshare
+        kip
       </a>
       <div class="flex items-center gap-3 sm:gap-4 min-w-0">
         <div class="hidden md:flex items-center gap-1.5 text-xs text-t3 font-mono">
@@ -426,7 +433,7 @@ onMounted(() => {
                 <span class="font-display font-bold text-t1" style="font-size: 0.9375rem;">Share secrets like this from your terminal</span>
               </div>
               <p class="text-t3" style="font-size: 0.75rem; margin-bottom: 1rem; line-height: 1.5;">
-                Your teammate used <span class="text-hi font-semibold">envshare</span> to send this. One command to encrypt, share, and auto-destroy.
+                Your teammate used <span class="text-hi font-semibold">kip</span> to send this. One command to encrypt, share, and auto-destroy.
               </p>
 
               <!-- Install tabs -->
@@ -502,7 +509,7 @@ onMounted(() => {
             href="/"
             class="inline-flex items-center gap-2 bg-s2 border border-b1 text-t2 font-medium text-sm px-6 py-3 rounded-xl hover:border-b2 hover:text-t1 transition-all"
           >
-            ← Back to envshare
+            ← Back to kip
           </a>
         </div>
 
@@ -519,7 +526,7 @@ onMounted(() => {
             href="/"
             class="inline-flex items-center gap-2 bg-s2 border border-b1 text-t2 font-medium text-sm px-6 py-3 rounded-xl hover:border-b2 hover:text-t1 transition-all"
           >
-            ← Back to envshare
+            ← Back to kip
           </a>
         </div>
 
@@ -559,13 +566,13 @@ onMounted(() => {
               <!-- Header -->
               <div class="flex items-center" style="gap: 0.5rem; margin-bottom: 0.375rem;">
                 <span class="rounded-full bg-hi" style="width: 0.5rem; height: 0.5rem;" />
-                <span class="font-mono font-bold text-hi" style="font-size: 0.8125rem;">envshare</span>
+                <span class="font-mono font-bold text-hi" style="font-size: 0.8125rem;">kip</span>
               </div>
               <h3 class="font-display font-bold text-t1" style="font-size: 1.25rem; margin-bottom: 0.5rem;">
                 Share secrets from your terminal
               </h3>
               <p class="text-t3" style="font-size: 0.8125rem; line-height: 1.6; margin-bottom: 1.25rem;">
-                Your teammate used envshare to send this. Install it and start sharing encrypted secrets in seconds.
+                Your teammate used kip to send this. Install it and start sharing encrypted secrets in seconds.
               </p>
 
               <!-- Selling points -->
@@ -655,7 +662,7 @@ onMounted(() => {
       <div style="max-width: 42rem; margin: 0 auto; padding: 1.5rem 1rem;" class="text-center">
         <div class="flex items-center justify-center" style="gap: 0.5rem; margin-bottom: 0.5rem;">
           <span class="rounded-full bg-hi pulse-glow" style="width: 0.4rem; height: 0.4rem;" />
-          <span class="font-mono font-bold text-t1" style="font-size: 0.8125rem;">envshare</span>
+          <span class="font-mono font-bold text-t1" style="font-size: 0.8125rem;">kip</span>
         </div>
         <p class="text-t3" style="font-size: 0.75rem; margin-bottom: 1rem;">
           Share .env files with your team securely. Zero-knowledge, self-destructing, open source.

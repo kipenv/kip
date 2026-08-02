@@ -7,7 +7,7 @@ interface Props {
 }
 
 const {
-  title = "envshare — Secure .env sharing with self-destructing links",
+  title = "kip — Secure .env sharing with self-destructing links",
   description = "A CLI that encrypts your secrets, generates a self-destructing link, and shares it in 3 seconds. The server never sees your keys.",
 } = Astro.props;
 ---
@@ -19,13 +19,14 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href="https://envshare.dev" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap"
-      rel="stylesheet"
-    />
+    <!--
+      Fonts are self-hosted from /public/fonts, not pulled from Google's CDN.
+      This layout also wraps /decrypt, which holds a secret's decryption key in
+      its URL fragment; that page must not contact a third party at all, and
+      SECURITY.md says so. Stylesheets cannot read the fragment, but every
+      recipient opening a link would still be announcing it to a CDN.
+    -->
+    <link rel="stylesheet" href="/fonts/fonts.css" />
     <title>{title}</title>
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

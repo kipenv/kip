@@ -5,9 +5,8 @@ import { useTheme } from '../composables/useTheme'
 const { current } = useTheme()
 
 const installMethods = [
-  { label: 'Homebrew', command: 'brew install envshare' },
-  { label: 'Go', command: 'go install github.com/antoniojosev/envshare@latest' },
-  { label: 'curl', command: 'curl -fsSL https://envshare.dev/install.sh | sh' },
+  { label: 'Go', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
+  { label: 'Source', command: 'git clone https://github.com/kipenv/kip.git && cd kip && make build' },
 ]
 
 const activeTab = ref(0)
@@ -30,7 +29,7 @@ interface TermLine {
 
 const lines: TermLine[] = [
   { text: '# sender → one command', class: 'text-t3' },
-  { text: '$ envshare push .env', class: 'prompt' },
+  { text: '$ kip push .env', class: 'prompt' },
   { text: '', class: '', separator: false }, // small pause
   { text: 'Scanning for exposed keys...', class: 'text-t3', indent: true },
   { text: '✓ No secrets detected in plaintext', class: 'text-emerald', indent: true },
@@ -39,11 +38,11 @@ const lines: TermLine[] = [
   { text: '---', class: '', separator: true },
   { text: '✓ Ready in 1.3s', class: 'text-emerald', indent: true },
   { text: '', class: '', separator: false },
-  { text: 'Link: https://envshare.dev/s/k9xm2p#AZ7kQ...', class: 'link', indent: true },
+  { text: 'Link: https://kip.example.com/s/k9xm2p#AZ7kQ...', class: 'link', indent: true },
   { text: 'Expires: 24h · Reads: 1', class: 'text-t3', indent: true },
   { text: '---', class: '', separator: true },
   { text: '# receiver → paste the link', class: 'text-t3' },
-  { text: '$ envshare pull https://envshare.dev/s/k9xm2p#AZ7kQ...', class: 'prompt' },
+  { text: '$ kip pull https://kip.example.com/s/k9xm2p#AZ7kQ...', class: 'prompt' },
   { text: '', class: '', separator: false },
   { text: '✓ Decrypted and saved → .env', class: 'text-emerald', indent: true },
   { text: '✓ Link destroyed', class: 'text-emerald', indent: true },
@@ -212,7 +211,7 @@ onUnmounted(() => {
                 <!-- Link line -->
                 <div v-else-if="line.class === 'link'" class="term-line-enter" :class="line.indent ? 'pl-4' : ''">
                   <span class="text-sky">Link: </span>
-                  <span class="text-amber">https://envshare.dev/s/k9xm2p<span class="text-hi">#AZ7kQ...</span></span>
+                  <span class="text-amber">https://kip.example.com/s/k9xm2p<span class="text-hi">#AZ7kQ...</span></span>
                 </div>
 
                 <!-- Normal line -->

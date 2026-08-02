@@ -4,16 +4,17 @@ import { Check } from 'lucide-vue-next'
 
 const copied = ref(false)
 
-const composeYml = `services:
-  envshare:
-    image: ghcr.io/envshare/server:latest
-    environment:
-      REDIS_URL: redis://redis:6379
-      PORT: "8080"
+const composeYml = `# deploy/docker-compose.yml
+services:
+  server:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: [kip-server, -redis, "redis://redis:6379"]
     ports: ["8080:8080"]
-    volumes: ["./data:/data"]
   redis:
-    image: redis:7-alpine`
+    image: redis:7-alpine
+    volumes: [redis-data:/data]`
 
 function copyCompose() {
   navigator.clipboard.writeText(composeYml).then(() => {
@@ -62,8 +63,8 @@ const benefits = [
         <div class="p-6 font-mono text-[13px] leading-[2]">
           <div class="text-t3"># That's it. No config files.</div>
           <div class="text-t1">services:</div>
-          <div class="pl-5 text-t1">envshare:</div>
-          <div class="pl-10"><span class="text-amber">image: </span><span class="text-hi">ghcr.io/envshare/server:latest</span></div>
+          <div class="pl-5 text-t1">kip:</div>
+          <div class="pl-10"><span class="text-amber">image: </span><span class="text-hi">ghcr.io/kipenv/kip-server:latest</span></div>
           <div class="pl-10"><span class="text-amber">environment:</span></div>
           <div class="pl-14"><span class="text-hi">REDIS_URL: redis://redis:6379</span></div>
           <div class="pl-14"><span class="text-hi">PORT: "8080"</span></div>
@@ -75,7 +76,7 @@ const benefits = [
           <div class="text-t3"># Boot in 30 seconds:</div>
           <div><span class="text-hi">$ </span><span class="text-t1">docker compose up -d</span></div>
           <div class="text-t3"># Point the CLI to your server:</div>
-          <div><span class="text-hi">$ </span><span class="text-t1">envshare config set server http://your-host:8080</span></div>
+          <div><span class="text-hi">$ </span><span class="text-t1">kip config set --server http://your-host:8080</span></div>
         </div>
       </div>
     </div>
