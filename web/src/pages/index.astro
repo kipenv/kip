@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Nav from "../components/Nav.vue";
 import Hero from "../components/Hero.vue";
 import TrustBar from "../components/TrustBar.vue";
+import Demo from "../components/Demo.vue";
 import HowItWorks from "../components/HowItWorks.vue";
 import Security from "../components/Security.vue";
 import Features from "../components/Features.vue";
@@ -19,6 +20,7 @@ import ThemeToggle from "../components/ThemeToggle.vue";
   <main>
     <Hero client:load />
     <TrustBar client:visible />
+    <Demo client:visible />
     <HowItWorks client:visible />
     <Security client:visible />
     <Features client:visible />
