@@ -1,6 +1,5 @@
 # Binaries
 bin/
-/envshare
 /kip
 *.exe
 *.exe~
@@ -44,7 +43,7 @@ assets/test-visual.gif
 .env
 .env.*
 !.env.example
-.envshare
+.kip
 *.db
 *.db-journal
 *.db-wal
