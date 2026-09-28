@@ -5,6 +5,7 @@ import { useTheme } from '../composables/useTheme'
 const { current } = useTheme()
 
 const installMethods = [
+  { label: 'curl', command: 'curl -fsSL https://raw.githubusercontent.com/kipenv/kip/main/install.sh | sh' },
   { label: 'Go', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
   { label: 'Source', command: 'git clone https://github.com/kipenv/kip.git && cd kip && make build' },
 ]

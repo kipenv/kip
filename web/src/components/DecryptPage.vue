@@ -30,9 +30,8 @@ const pendingSecret = ref<import('../lib/crypto').SecretResponse | null>(null)
 const showInstallModal = ref(false)
 
 const installMethods = [
-  { label: 'Homebrew', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
+  { label: 'curl', command: 'curl -fsSL https://raw.githubusercontent.com/kipenv/kip/main/install.sh | sh' },
   { label: 'Go', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
-  { label: 'curl', command: 'go install github.com/kipenv/kip/cmd/kip@latest' },
 ]
 const activeInstall = ref(0)
 
