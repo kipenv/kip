@@ -7,11 +7,16 @@
 Share encrypted secrets with self-destructing links. One command. No accounts. Zero-knowledge.
 
 [![CI](https://github.com/kipenv/kip/actions/workflows/ci.yml/badge.svg)](https://github.com/kipenv/kip/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/kipenv/kip)](https://github.com/kipenv/kip/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![Self-Hosted](https://img.shields.io/badge/Self--Hosted-Docker-2496ED?logo=docker&logoColor=white)](#self-hosting)
 
 [Install](#install) · [How It Works](#how-it-works) · [Self-Host](#self-hosting) · [Security](#security) · [Roadmap](#roadmap)
+
+<br>
+
+![kip demo: install, push a .env, pull it on another machine](assets/kip-demo.gif)
 
 </div>
 
@@ -57,6 +62,18 @@ server. Once the read limit is reached, the ciphertext is deleted.
 
 ## Install
 
+### Script (Linux / macOS)
+
+Downloads the latest release binary for your OS and architecture into
+`/usr/local/bin`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kipenv/kip/main/install.sh | sh
+```
+
+Prebuilt binaries for Linux, macOS and Windows (amd64 / arm64) are on the
+[releases page](https://github.com/kipenv/kip/releases).
+
 ### Go
 
 ```bash
@@ -71,8 +88,7 @@ cd kip
 make build        # → bin/kip
 ```
 
-Homebrew and a `curl | sh` installer are on the [roadmap](#roadmap); they need a
-tagged release first.
+A Homebrew formula is on the [roadmap](#roadmap).
 
 ---
 
@@ -244,6 +260,11 @@ are membership only. Wiring them up is the top [roadmap](#roadmap) item.
 
 kip is **free to self-host forever**. MIT. Your data, your servers.
 
+The server ships as a **Docker image only** — it embeds SQLite through cgo, so
+there is no prebuilt `kip-server` binary on the releases page. Build it with
+`deploy/Dockerfile` (the Compose files below do that for you) or, on a machine
+with a C toolchain, `make server-build`.
+
 Two Compose files live under `deploy/`:
 
 ```bash
@@ -360,8 +381,8 @@ Honest list of what is not there yet:
 - **Team sharing in the CLI** — `push --all` / `--to` / `--pin`, `inbox`, `ls`
   and `diff` against a team's pinned env. The API and its tests already exist;
   the commands do not.
-- **Tagged releases** — cross-compiled binaries via GoReleaser, then a Homebrew
-  formula and a `curl | sh` installer.
+- **Homebrew formula** — CLI binaries are cross-compiled with GoReleaser and
+  installable via `install.sh`; a tap is the missing piece.
 - **Optional LLM-assisted scanning** — bring your own endpoint (Ollama, or any
   OpenAI-compatible API) to complement the regex pass.
 - **A public instance.** For now: self-host or run locally.
