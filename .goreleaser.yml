@@ -1,5 +1,10 @@
 version: 2
 
+# Only the CLI is released as a binary. The server links SQLite through cgo
+# (mattn/go-sqlite3), so a CGO_ENABLED=0 cross-compile produces a binary that
+# crashes on first database open. It ships as a Docker image instead — see
+# deploy/Dockerfile, which builds it with CGO_ENABLED=1.
+
 builds:
   - id: cli
     main: ./cmd/kip/
@@ -16,32 +21,15 @@ builds:
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}}
 
-  - id: server
-    main: ./server/cmd/server/
-    binary: kip-server
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-    goarch:
-      - amd64
-      - arm64
-    ldflags:
-      - -s -w -X main.version={{.Version}}
-
 archives:
   - id: cli
-    builds:
+    ids:
       - cli
     name_template: "kip_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
-        format: zip
-
-  - id: server
-    builds:
-      - server
-    name_template: "kip-server_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+        formats:
+          - zip
 
 checksum:
   name_template: "checksums.txt"
