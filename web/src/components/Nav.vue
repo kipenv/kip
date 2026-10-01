@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useTheme } from '../composables/useTheme'
+import { track } from '../lib/analytics'
 
 const { current } = useTheme()
 const scrolled = ref(false)
@@ -15,6 +16,7 @@ function copyInstall() {
   navigator.clipboard.writeText('go install github.com/kipenv/kip/cmd/kip@latest').then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
+    track('install_copy', { method: 'go' })
   })
 }
 
@@ -50,7 +52,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           <a href="#how" class="text-[13px] text-t3 hover:text-t2 transition-colors">How it works</a>
           <a href="#features" class="text-[13px] text-t3 hover:text-t2 transition-colors">Features</a>
           <a href="#selfhost" class="text-[13px] text-t3 hover:text-t2 transition-colors">Self-host</a>
-          <a href="https://github.com/kipenv/kip" target="_blank" rel="noopener" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
+          <a href="https://github.com/kipenv/kip" target="_blank" rel="noopener" data-traccia-event="github_click" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
         </div>
 
         <!-- Desktop CTA -->
@@ -64,6 +66,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           </button>
           <a
             href="#selfhost"
+            @click="track('cta_click', { cta: 'get_started' })"
             class="bg-accent text-accent-text font-semibold text-[13px] px-5 py-2 rounded-lg hover:bg-accent-hover hover:-translate-y-px transition-all"
           >
             Get started
@@ -102,7 +105,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           <a href="#selfhost" @click="mobileOpen = false" class="block text-t2 hover:text-t1">Self-host</a>
           <a
             href="#selfhost"
-            @click="mobileOpen = false"
+            @click="mobileOpen = false; track('cta_click', { cta: 'get_started' })"
             class="block w-full text-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-accent-text"
           >
             Get started

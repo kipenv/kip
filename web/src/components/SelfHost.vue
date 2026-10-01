@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Check } from 'lucide-vue-next'
+import { track } from '../lib/analytics'
 
 const copied = ref(false)
 
@@ -20,6 +21,7 @@ function copyCompose() {
   navigator.clipboard.writeText(composeYml).then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
+    track('install_copy', { method: 'docker-compose' })
   })
 }
 

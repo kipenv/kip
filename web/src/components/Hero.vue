@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useTheme } from '../composables/useTheme'
+import { track } from '../lib/analytics'
 
 const { current } = useTheme()
 
@@ -14,9 +15,11 @@ const activeTab = ref(0)
 const copied = ref(false)
 
 function copyCommand() {
-  navigator.clipboard.writeText(installMethods[activeTab.value].command).then(() => {
+  const method = installMethods[activeTab.value]
+  navigator.clipboard.writeText(method.command).then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
+    track('install_copy', { method: method.label.toLowerCase() })
   })
 }
 

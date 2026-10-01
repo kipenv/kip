@@ -4,12 +4,24 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * Opt a page in to the analytics tag. Off by default: /decrypt carries a
+   * secret's key in its URL fragment and must not load any third-party
+   * script, so pages have to ask for analytics rather than opt out of it.
+   */
+  analytics?: boolean;
 }
 
 const {
   title = "kip — Secure .env sharing with self-destructing links",
   description = "A CLI that encrypts your secrets, generates a self-destructing link, and shares it in 3 seconds. The server never sees your keys.",
+  analytics = false,
 } = Astro.props;
+
+// The tag is only rendered in production builds that set a project id, so a
+// local build or a fork without the variable ships no tracking at all.
+const tracciaProjectId = import.meta.env.PUBLIC_TRACCIA_PROJECT_ID;
+const analyticsEnabled = analytics && import.meta.env.PROD && Boolean(tracciaProjectId);
 ---
 
 <!doctype html>
@@ -32,6 +44,17 @@ const {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    {
+      analyticsEnabled && (
+        <script
+          is:inline
+          src="https://traccia-a4qm.onrender.com/t.js"
+          data-project={tracciaProjectId}
+          data-errors="true"
+          defer
+        />
+      )
+    }
   </head>
   <body class="min-h-screen font-sans antialiased">
     <slot />

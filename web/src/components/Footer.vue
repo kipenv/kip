@@ -5,7 +5,7 @@
       <span class="font-mono text-[13px] text-t3">kip</span>
     </div>
     <div class="flex items-center gap-6">
-      <a href="https://github.com/kipenv/kip" target="_blank" rel="noopener" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
+      <a href="https://github.com/kipenv/kip" target="_blank" rel="noopener" data-traccia-event="github_click" class="text-[13px] text-t3 hover:text-t2 transition-colors">GitHub</a>
       <a href="#" class="text-[13px] text-t3 hover:text-t2 transition-colors">Docs</a>
       <a href="#" class="text-[13px] text-t3 hover:text-t2 transition-colors">SECURITY.md</a>
     </div>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { track } from '../lib/analytics'
 
 const copied = ref(false)
 function copyInstall() {
   navigator.clipboard.writeText('go install github.com/kipenv/kip/cmd/kip@latest').then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
+    track('install_copy', { method: 'go' })
   })
 }
 </script>
@@ -32,7 +34,7 @@ function copyInstall() {
 
     <p class="text-[13px] text-t3 font-mono">
       Also: <code class="text-t2">go install github.com/kipenv/kip/cmd/kip@latest</code> ·
-      <a href="#selfhost" class="text-t2 hover:text-t1 transition-colors">self-host guide</a>
+      <a href="#selfhost" @click="track('cta_click', { cta: 'self_host_guide' })" class="text-t2 hover:text-t1 transition-colors">self-host guide</a>
     </p>
   </section>
 </template>

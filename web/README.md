@@ -40,6 +40,15 @@ path must serve the decrypt page, which reads the id from `location.pathname`.
 `nginx.conf` does that with `try_files /decrypt/index.html`; any other host
 needs the equivalent rewrite, or shared links 404.
 
+## Analytics
+
+The landing page can load a [Traccia](https://github.com/antoniojosev/traccia)
+tag for pageviews and a few click events (install command copied, GitHub link,
+main CTAs). It is rendered only in production builds and only when
+`PUBLIC_TRACCIA_PROJECT_ID` is set at build time (see `.env.example`); leave it
+empty and the site ships without any analytics. The decrypt page never loads
+it, per the second invariant above.
+
 ## API base URL
 
 The decrypt page calls the kip server to fetch the ciphertext. It defaults to
