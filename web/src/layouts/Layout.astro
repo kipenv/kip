@@ -45,13 +45,15 @@ const analyticsEnabled = analytics && import.meta.env.PROD && Boolean(tracciaPro
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     {
+      /* async rather than defer: defer scripts execute in order with the
+         hydration modules, so a slow analytics host would block the islands. */
       analyticsEnabled && (
         <script
           is:inline
           src="https://traccia-a4qm.onrender.com/t.js"
           data-project={tracciaProjectId}
           data-errors="true"
-          defer
+          async
         />
       )
     }
